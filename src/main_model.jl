@@ -173,9 +173,6 @@ function get_model(; Agriculture_gtap::String = "midDF",
         add_comp!(m, MimiSSPs.SSPs, :Socioeconomic, first = damages_first, before = :ch4_cycle);
     end
 
-    # Always use SSP emissions (for the RFF-SPs and SSPs hybrid)
-    add_comp!(m, MimiSSPs.SSPs, :SSP_emissions, first = damages_first, before = :ch4_cycle);
-
     # Add PerCapitaGDP component
 	add_comp!(m, PerCapitaGDP, :PerCapitaGDP, first=damages_first, after = :Socioeconomic);
 
@@ -402,13 +399,7 @@ function get_model(; Agriculture_gtap::String = "midDF",
         isnothing(RFFSPsample) ? nothing : update_param!(m, :Socioeconomic, :id, RFFSPsample)
     end
 
-    update_param!(m, :SSP_emissions, :SSP_source, "Benveniste") # only available source to 2300 at this time in MimiSSPs
-    update_param!(m, :SSP_emissions, :SSP, SSP) # select the SSP from RCMIP name ie. SSP2
-    update_param!(m, :SSP_emissions, :emissions_source, "Leach") # only available source to 2300 at this time in MimiSSPs
-    update_param!(m, :SSP_emissions, :emissions_scenario, SSP_scenario) # full name ie. SSSP245
-
     connect_param!(m, :Socioeconomic, :country_names, :model_country_names)
-    connect_param!(m, :SSP_emissions, :country_names, :model_country_names)
     
     # Feedback of Socioeconomic Emissions back to FAIR
 
@@ -421,15 +412,15 @@ function get_model(; Agriculture_gtap::String = "midDF",
 
     # Here we couple the identity component co2_emissions to the SSP output, and then the
     # FAIR emissions component to that identity component co2_emissions
-    connect_param!(m, :co2_emissions_identity => :input_co2, :SSP_emissions => :co2_emissions, ar6_emissions.FossilCO2 .+ ar6_emissions.OtherCO2)
+    set_param!(m, :co2_emissions_identity, :input_co2, ar6_emissions.FossilCO2 .+ ar6_emissions.OtherCO2)
     connect_param!(m, :co2_cycle => :E_co2, :co2_emissions_identity => :output_co2)
 
     # do the same for n2o_emissions
-    connect_param!(m, :n2o_emissions_identity => :input_n2o, :SSP_emissions => :n2o_emissions, ar6_emissions.N2O)
+    set_param!(m, :n2o_emissions_identity, :input_n2o, ar6_emissions.N2O)
     connect_param!(m, :n2o_cycle => :fossil_emiss_N₂O, :n2o_emissions_identity => :output_n2o)
 
     # do the same for ch4_emissions
-    connect_param!(m, :ch4_emissions_identity => :input_ch4, :SSP_emissions => :ch4_emissions, ar6_emissions.CH4)
+    set_param!(m, :ch4_emissions_identity, :input_ch4, ar6_emissions.CH4)
     connect_param!(m, :ch4_cycle => :fossil_emiss_CH₄, :ch4_emissions_identity => :output_ch4)
 
     # Land Use CO2 Emissions - FAIRv1.6.2 component :landuse_forcing and parameter :landuse_emiss
