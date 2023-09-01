@@ -128,7 +128,9 @@ function get_mcs(trials;
     if socioeconomics_source == :RFF
         distrib = rffsp_sampling == :random ? EmpiricalDistribution(collect(1:10_000)) : SampleStore(rffsp_sampling_ids)
         add_RV!(mcs, :socio_id_rv, distrib)
+        add_RV!(mcs, :emiss_id_rv, distrib)
         add_transform!(mcs, :Socioeconomic, :id, :(=), :socio_id_rv)
+        add_transform!(mcs, :Socioeconomic, :id_emissions, :(=), :emiss_id_rv)
     end
 
     #add BRICK random variable - assign one Normally distributed RV per year
