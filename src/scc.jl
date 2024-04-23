@@ -651,12 +651,12 @@ function _compute_scc_mcs(mm::MarginalModel,
             save("$output_dir/results/model_2/slr_damages.csv")
 
         segments = Symbol.(dim_keys(ciam_base, :segments))
-        df = DataFrame(slr_damages[:base_segments_2100], :auto) |> 
-            i -> rename!(i, segments) |>
-            i -> insertcols!(i, 1, :trial => 1:n) |> 
-            i -> stack(i, Not(:trial)) |>
-            i -> rename!(i, [:trial, :segment, :slr_damages_2100]) |>
-            save("$output_dir/results/model_1/slr_damages_2100_by_segment.csv")
+        # df = DataFrame(slr_damages[:base_segments_2100], :auto) |> 
+        #     i -> rename!(i, segments) |>
+        #     i -> insertcols!(i, 1, :trial => 1:n) |> 
+        #     i -> stack(i, Not(:trial)) |>
+        #     i -> rename!(i, [:trial, :segment, :slr_damages_2100]) |>
+        #     save("$output_dir/results/model_1/slr_damages_2100_by_segment.csv")
             
         # domestic 
         if compute_domestic_values
